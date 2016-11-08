@@ -10,7 +10,6 @@ import Haste.Graphics.Canvas
 -- for all stations
 dataUrl = "http://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/station/71420/period/latest-months/data.json"
 
-
 pointsToShape :: [Point] -> Shape ()
 pointsToShape [] =
   return ()
@@ -31,14 +30,24 @@ dataToPoints pos (j:js) =
 takeFromEnd :: Int -> [a] -> [a]
 takeFromEnd num l =
   reverse $ take num $ reverse l
-  
+
 plotData :: Canvas -> IO ()
 plotData canvas =
   let callback :: Maybe JSON -> IO ()
       callback (Just dat) =
         do
           let Arr dataPoints = ( dat ! (toJSString "value"))
-          let points = dataToPoints 0 $ takeFromEnd 800 $ dataPoints
+          let scopePoints = takeFromEnd 800 $ dataPoints
+          let start = head scopePoints
+          let Num tstart = start ! (toJSString "date")
+          -- let startDate = "" --show $ startBStr
+          let end = last scopePoints
+          let Num tend = end ! (toJSString "date")
+          eval $ toJSString $
+            "var start = new Date(" ++ (show tstart) ++ ");" ++
+            "var end = new Date (" ++ (show tend) ++ "); " ++
+            "document.getElementById(\"title\").innerHTML = \"Temparature in Gothenburg from \" + start.toDateString() + \" \" + start.toTimeString() + \" to \" + end.toDateString() + \" \" + end.toTimeString();"
+          let points = dataToPoints 0 scopePoints
           let picture = fill $ pointsToShape points
           render canvas $ do
             setFillColor (RGB 128 128 128)
