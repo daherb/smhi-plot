@@ -16,7 +16,7 @@ pointsToShape [] =
   return ()
 pointsToShape ((x,y):ps) =
   do
-    rect (x,0) (x,y)
+    rect (x,300) (x+1,200-y*5)
     pointsToShape ps
 
 dataToPoints :: Double -> [JSON] -> [Point]
