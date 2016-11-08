@@ -17,6 +17,23 @@ getData =
     rsp <- simpleHTTP (getRequest dataUrl)
       
 
+pointsToShape :: [Point] -> Shape ()
+pointsToShape [] =
+  return ()
+pointsToShape ((x,y):ps) =
+  do
+    rect (x,0) (x,y)
+    pointsToShape ps
+
+dataToPoints :: Double -> [JSON] -> [Point]
+dataToPoints _ [] = []
+dataToPoints pos (j:js) =
+  let
+    Str json =  j ! toJSString "value" 
+    y =  read $ fromJust $ fromJSString json
+  in
+    (pos,y):(dataToPoints (pos + 1) js)
+
 plotData :: Canvas -> JSON -> IO ()
 plotData canvas dat =
   do
