@@ -4,7 +4,6 @@ import Haste
 import Haste.Ajax
 import Haste.JSON
 import Haste.Graphics.Canvas
-import Network.HTTP
 
 -- Several month from gothenburg
 -- check http://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/station/
