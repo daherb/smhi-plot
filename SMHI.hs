@@ -46,7 +46,7 @@ plotData canvas =
           eval $ toJSString $
             "var start = new Date(" ++ (show tstart) ++ ");" ++
             "var end = new Date (" ++ (show tend) ++ "); " ++
-            "document.getElementById(\"title\").innerHTML = \"Temparature in Gothenburg from \" + start.toDateString() + \" \" + start.toTimeString() + \" to \" + end.toDateString() + \" \" + end.toTimeString();"
+            "document.getElementById(\"title\").innerHTML = \"Hourly Temparature in Gothenburg from \" + start.toDateString() + \" \" + start.toTimeString() + \" to \" + end.toDateString() + \" \" + end.toTimeString();"
           let points = dataToPoints 0 scopePoints
           let picture = fill $ pointsToShape points
           render canvas $ do
