@@ -7,7 +7,5 @@ main =
   do
     writeLog "Starting"
     Just canvas <- getCanvasById "canvas"
-    dat <- getData
-    writeLog $ show dat
-    plotData canvas dat
+    plotData canvas
     return ()
