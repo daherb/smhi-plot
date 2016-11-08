@@ -14,8 +14,14 @@ dataUrl = "http://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/s
 getData :: IO JSON
 getData =
   do
-    rsp <- simpleHTTP (getRequest dataUrl)
-      
+    writeLog dataUrl
+    let req = getRequest dataUrl
+    rsp <- simpleHTTP req
+    writeLog "foobar"
+--    body <- getResponseBody rsp
+--    let decode = decodeJSON $ toJSString body
+--    return $ either (\_ -> Null) id decode
+    return Null
 
 pointsToShape :: [Point] -> Shape ()
 pointsToShape [] =
