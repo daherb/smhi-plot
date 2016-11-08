@@ -18,4 +18,12 @@ getData =
       
 
 plotData :: Canvas -> JSON -> IO ()
-plotData = return ()
+plotData canvas dat =
+  do
+    let Arr dataPoints = ( dat ! (toJSString "value"))
+    let points = dataToPoints 0 dataPoints
+    let picture = fill $ pointsToShape points 
+    render canvas $ do
+      setFillColor (RGB 128 128 128)
+      picture
+    
