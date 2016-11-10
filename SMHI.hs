@@ -1,5 +1,6 @@
 module SMHI where
 import Data.Maybe
+import Data.Char
 import Haste
 import Haste.Ajax
 import Haste.JSON
@@ -8,15 +9,16 @@ import Haste.Graphics.Canvas
 -- Several month from gothenburg
 -- check http://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/station/
 -- for all stations
-dataUrl = "http://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/station/71420/period/latest-months/data.json"
+dataUrlPre = "http://opendata-download-metobs.smhi.se/api/version/1.0/parameter/1/station/71420/period/latest-"
 
-pointsToShape :: [Point] -> Shape ()
-pointsToShape [] =
+
+pointsToShape :: [Point] -> Double -> Shape ()
+pointsToShape [] _ =
   return ()
-pointsToShape ((x,y):ps) =
+pointsToShape ((x,y):ps) width =
   do
-    rect (x,300) (x+1,200-y*5)
-    pointsToShape ps
+    rect (x*width,300) ((x+1) * width,200-y*5)
+    pointsToShape ps width
 
 dataToPoints :: Double -> [JSON] -> [Point]
 dataToPoints _ [] = []
@@ -31,11 +33,12 @@ takeFromEnd :: Int -> [a] -> [a]
 takeFromEnd num l =
   reverse $ take num $ reverse l
 
-plotData :: Canvas -> IO ()
-plotData canvas =
+plotData :: String -> IO ()
+plotData period =
   let callback :: Maybe JSON -> IO ()
       callback (Just dat) =
         do
+          Just canvas <- getCanvasById $ "canvas" ++ period
           let Arr dataPoints = ( dat ! (toJSString "value"))
           let scopePoints = takeFromEnd 800 $ dataPoints
           let start = head scopePoints
@@ -46,9 +49,9 @@ plotData canvas =
           eval $ toJSString $
             "var start = new Date(" ++ (show tstart) ++ ");" ++
             "var end = new Date (" ++ (show tend) ++ "); " ++
-            "document.getElementById(\"title\").innerHTML = \"Hourly Temparature in Gothenburg from \" + start.toDateString() + \" \" + start.toTimeString() + \" to \" + end.toDateString() + \" \" + end.toTimeString();"
+            "document.getElementById(\"title" ++ period ++"\").innerHTML = \"Hourly Temparature in Gothenburg from \" + start.toDateString() + \" \" + start.toTimeString() + \" to \" + end.toDateString() + \" \" + end.toTimeString();"
           let points = dataToPoints 0 scopePoints
-          let picture = fill $ pointsToShape points
+          let picture = fill $ pointsToShape points (800 / ( fromIntegral $ length points ) )
           render canvas $ do
             setFillColor (RGB 128 128 128)
             picture
@@ -69,6 +72,7 @@ plotData canvas =
       callback Nothing = return ()
   in
   do
+    let dataUrl = dataUrlPre ++ (map toLower period) ++ "/data.json"
     writeLog dataUrl
     ajaxRequest GET dataUrl noParams callback
     

@@ -6,6 +6,8 @@ main :: IO ()
 main =
   do
     writeLog "Starting"
-    Just canvas <- getCanvasById "canvas"
-    plotData canvas
+--    Just canvas <- getCanvasById "canvasMonths"
+    plotData "Hour"
+    plotData "Day"
+    plotData "Months"
     return ()
